@@ -59,6 +59,10 @@ node index.js
 
 API will run at: http://localhost:5000
 
+**For my personal use**  (i  forget to many times)
+
+
+
 **🧠 Available APIs**
 
 Endpoint	Description
