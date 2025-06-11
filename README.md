@@ -59,7 +59,44 @@ node index.js
 
 API will run at: http://localhost:5000
 
-**For my personal use**  (i  forget to many times)
+**For my personal use**  (I  forget too many times) VPS instructions
+
+🔐  Create .env File
+
+nano .env
+
+add the required data 
+
+
+Use pm2 for stability:
+
+npm install -g pm2
+
+pm2 start index.js --name localBrowser
+
+pm2 save
+
+pm2 startup
+
+
+Stop and delete the old process:
+
+pm2 stop localBrowser
+
+pm2 delete localBrowser
+
+**Logs**
+
+pm2 logs localBrowser
+
+
+if you're running as administrator, use:
+
+sudo chown -R administrator:administrator /var/www/localBrowser/logs
+
+Then restart the app:
+
+pm2 restart localBrowser
 
 
 
