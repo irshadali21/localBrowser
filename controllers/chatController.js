@@ -1,37 +1,35 @@
-const express = require('express');
-const router = express.Router();
+// controllers/chatController.js
 const { prepareChat, sendChat, closeChat } = require('../helpers/chatManager');
 
-
-
-router.post('/prepare-chat', async (req, res) => {
+// Prepare Gemini chat session
+exports.prepare = async (req, res) => {
   try {
     const result = await prepareChat();
     res.json(result);
-  } catch (e) {
-    res.status(500).json({ error: 'Error preparing chat', details: e.message });
+  } catch (err) {
+    console.error('[ChatController] Prepare error:', err);
+    res.status(500).json({ error: 'CHAT_PREPARE_FAILED', message: err.message });
   }
-});
+};
 
-router.post('/chat', async (req, res) => {
+// Send a message to Gemini
+exports.message = async (req, res) => {
   try {
-    const { prompt } = req.body;
-    if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
-
-    const reply = await sendChat(prompt);
+    const reply = await sendChat(req.body.prompt);
     res.json({ reply });
-  } catch (e) {
-    res.status(500).json({ error: 'Error sending message', details: e.message });
+  } catch (err) {
+    console.error('[ChatController] Message error:', err);
+    res.status(500).json({ error: 'CHAT_SEND_FAILED', message: err.message });
   }
-});
+};
 
-router.post('/close-chat', async (req, res) => {
+// Close Gemini chat tab
+exports.close = async (req, res) => {
   try {
     await closeChat();
-    res.json({ status: 'chat closed' });
-  } catch (e) {
-    res.status(500).json({ error: 'Error closing chat', details: e.message });
+    res.json({ status: 'chat_closed' });
+  } catch (err) {
+    console.error('[ChatController] Close error:', err);
+    res.status(500).json({ error: 'CHAT_CLOSE_FAILED', message: err.message });
   }
-});
-
-module.exports = router;
+};

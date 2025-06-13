@@ -1,6 +1,7 @@
+// chatManager.js
 require('dotenv').config();
-
 const configBrowser = require('../puppeteerConfig');
+
 let browser = null;
 let chatPage = null;
 let idleTimer = null;
@@ -8,51 +9,28 @@ const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
 async function prepareChat() {
   if (chatPage && !chatPage.isClosed()) return { status: 'ready' };
+
   browser = browser || await configBrowser();
   chatPage = await browser.newPage();
 
-  chatPage.on('console', msg => {
-    console.log('[Browser]', msg.text());
-  });
+  chatPage.on('console', msg => console.log('[Browser]', msg.text()));
+
   await chatPage.goto('https://gemini.google.com/app', { waitUntil: 'networkidle2' });
   await dismissGeminiPopup(chatPage);
 
-
-  const isLoggedOut = await chatPage.evaluate(() => {
-    const loginBlock = Array.from(document.querySelectorAll('div')).find(div =>
+  const isLoggedOut = await chatPage.evaluate(() =>
+    Array.from(document.querySelectorAll('div')).some(div =>
       div.innerText?.includes('Sign in to start saving your chats')
-    );
-    return !!loginBlock;
-  });
-
-
+    )
+  );
 
   if (isLoggedOut) {
-    // Navigate to Google login
-    await chatPage.goto('https://accounts.google.com/');
-
-    // Fill login form (update selectors if they change)
-    await chatPage.type('input[type="email"]', process.env.GOOGLE_EMAIL, { delay: 100 });
-    await chatPage.keyboard.press('Enter');
-
-    await chatPage.waitForNavigation({ waitUntil: 'networkidle2' });
-
-    await chatPage.waitForSelector('input[type="password"]', { visible: true });
-
-    await chatPage.type('input[type="password"]', process.env.GOOGLE_PASSWORD, { delay: 100 });
-    await chatPage.keyboard.press('Enter');
-
-    await chatPage.waitForNavigation({ waitUntil: 'networkidle2' });
-
-    await chatPage.goto('https://gemini.google.com/app', { waitUntil: 'networkidle2' });
-
-    const stillLoggedOut = await chatPage.evaluate(() => {
-      return !!document.querySelector('a[href*="accounts.google.com"]');
-    });
-
-    if (stillLoggedOut) {
-      return { status: 'login_failed' };
-    }
+    console.log('[Gemini] Logging in...');
+    await performLogin(chatPage);
+    const stillLoggedOut = await chatPage.evaluate(() =>
+      !!document.querySelector('a[href*="accounts.google.com"]')
+    );
+    if (stillLoggedOut) return { status: 'login_failed' };
   }
 
   resetIdleTimer();
@@ -60,47 +38,30 @@ async function prepareChat() {
 }
 
 async function sendChat(message) {
-  if (!chatPage || chatPage.isClosed()) {
-    await prepareChat();
-  }
-
+  if (!chatPage || chatPage.isClosed()) await prepareChat();
 
   await chatPage.setRequestInterception(true);
-
   let streamDone = false;
-  chatPage.on('requestfinished', (req) => {
-    const url = req.url();
-    if (url.includes('StreamGenerate')) {
+
+  chatPage.on('requestfinished', req => {
+    if (req.url().includes('StreamGenerate')) {
       console.log('[Gemini] StreamGenerate completed');
       streamDone = true;
     }
   });
 
-
   await chatPage.type('rich-textarea', message);
   await chatPage.keyboard.press('Enter');
 
-  // Wait for StreamGenerate to finish
   await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => reject('Timeout waiting for Gemini response'), 15000);
-    const check = () => {
-      if (streamDone) {
-        clearTimeout(timeout);
-        resolve();
-      } else {
-        setTimeout(check, 100);
-      }
-    };
-    check();
+    const poll = () => streamDone ? (clearTimeout(timeout), resolve()) : setTimeout(poll, 100);
+    poll();
   });
 
-  // Extract the last response from .message-content
   const response = await chatPage.evaluate(() => {
     const responses = Array.from(document.querySelectorAll('message-content'));
-    console.log('response:', responses);
-    console.log('[Gemini] Last response:', responses[responses.length - 1]);
-    const lastResponse = responses[responses.length - 1];
-    return lastResponse?.innerText?.trim() || 'No response found.';
+    return responses.at(-1)?.innerText?.trim() || 'No response found.';
   });
 
   resetIdleTimer();
@@ -113,6 +74,19 @@ async function closeChat() {
   clearTimeout(idleTimer);
 }
 
+async function performLogin(page) {
+  await page.goto('https://accounts.google.com/');
+  await page.type('input[type="email"]', process.env.GOOGLE_EMAIL, { delay: 100 });
+  await page.keyboard.press('Enter');
+  await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
+  await page.waitForSelector('input[type="password"]', { visible: true });
+  await page.type('input[type="password"]', process.env.GOOGLE_PASSWORD, { delay: 100 });
+  await page.keyboard.press('Enter');
+  await page.waitForNavigation({ waitUntil: 'networkidle2' });
+  await page.goto('https://gemini.google.com/app', { waitUntil: 'networkidle2' });
+}
+
 async function dismissGeminiPopup(page) {
   console.log('[Popup] Checking for Gemini onboarding popup');
   try {
@@ -120,14 +94,14 @@ async function dismissGeminiPopup(page) {
     const buttons = await page.$$('div[role="dialog"] button');
     for (const button of buttons) {
       const text = await page.evaluate(el => el.innerText, button);
-      if (text.toLowerCase().includes('no thanks') || text.toLowerCase().includes('dismiss')) {
+      if (/no thanks|dismiss/i.test(text)) {
         await button.click();
         console.log('[Popup] Dismissed Gemini onboarding popup');
         break;
       }
     }
   } catch {
-    // No popup appeared — continue silently
+    // Silent fail if popup not found
   }
 }
 
