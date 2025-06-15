@@ -1,5 +1,6 @@
 // controllers/chatController.js
 const { prepareChat, sendChat, closeChat } = require('../helpers/chatManager');
+const { logErrorToDB } = require('../utils/errorLogger');
 
 // Prepare Gemini chat session
 exports.prepare = async (req, res) => {
@@ -19,6 +20,13 @@ exports.message = async (req, res) => {
     res.json({ reply });
   } catch (err) {
     console.error('[ChatController] Message error:', err);
+    logErrorToDB({
+      type: 'CHAT_SEND_FAILED',
+      message: err.message,
+      stack: err.stack,
+      route: '/chat/message',
+      input: req.body
+    });
     res.status(500).json({ error: 'CHAT_SEND_FAILED', message: err.message });
   }
 };

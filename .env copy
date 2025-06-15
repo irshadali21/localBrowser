@@ -2,9 +2,15 @@
 PORT=5000
 API_KEY=
 
-# Google login credentials for Gemini automation
-GOOGLE_EMAIL=your_email@gmail.com
-GOOGLE_PASSWORD=your_secure_password
+
+
+
+# we wil be using this for whatsapp messages https://whatsender-documentation.amcoders.com/  
+
+WHATSAPP_API=
+WHATSAPP_APPKEY=
+WHATSAPP_AUTHKEY=
+WHATSAPP_TO=
 
 # Optional: Puppeteer headless setting
 HEADLESS=false

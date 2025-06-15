@@ -5,7 +5,7 @@ const {
   visitUrl,
   scrapeProduct
 } = require('../helpers/browserHelper'); // moved core logic to helpers
-
+const { logErrorToDB } = require('../utils/errorLogger');
 // POST /browser/execute
 exports.execute = async (req, res) => {
   try {
@@ -13,6 +13,7 @@ exports.execute = async (req, res) => {
     res.json({ result });
   } catch (err) {
     console.error('[BrowserController] Execute error:', err);
+    logErrorToDB({ type: 'EXECUTE_FAILED', message: err.message, stack: err.stack, route: '/browser/execute', input: req.body });
     res.status(500).json({ error: 'EXECUTE_FAILED', message: err.message });
   }
 };
@@ -24,6 +25,7 @@ exports.search = async (req, res) => {
     res.json({ results });
   } catch (err) {
     console.error('[BrowserController] Search error:', err);
+    logErrorToDB({ type: 'SEARCH_FAILED', message: err.message, stack: err.stack, route: '/browser/search', input: req.query });
     res.status(500).json({ error: 'SEARCH_FAILED', message: err.message });
   }
 };
@@ -35,6 +37,7 @@ exports.visit = async (req, res) => {
     res.json({ html });
   } catch (err) {
     console.error('[BrowserController] Visit error:', err);
+    logErrorToDB({ type: 'VISIT_FAILED', message: err.message, stack: err.stack, route: '/browser/visit', input: req.query });
     res.status(500).json({ error: 'VISIT_FAILED', message: err.message });
   }
 };
@@ -47,6 +50,7 @@ exports.scrape = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('[BrowserController] Scrape error:', err);
+    logErrorToDB({ type: 'SCRAPE_FAILED', message: err.message, stack: err.stack, route: '/browser/scrape', input: req.query });
     res.status(500).json({ error: 'SCRAPE_FAILED', message: err.message });
   }
 };

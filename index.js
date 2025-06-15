@@ -19,6 +19,8 @@ app.use((req, res, next) => {
 // Routes
 app.use('/chat', require('./routes/chatRoutes'));
 app.use('/browser', require('./routes/browserRoutes'));
+app.use('/error', require('./routes/errorRoutes'));
+
 
 // Default route
 app.get('/', (req, res) => {
