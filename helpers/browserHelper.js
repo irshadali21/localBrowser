@@ -67,7 +67,7 @@ async function visitUrl(url) {
 async function scrapeProduct(url, vendor) {
     const page = await getConfiguredPage();
     try {
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await gotoWithRetry(page, url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
         const strategy = scraperStrategies[vendor.toLowerCase()];
         if (!strategy) throw new Error(`No scraper available for vendor: ${vendor}`);
@@ -77,6 +77,20 @@ async function scrapeProduct(url, vendor) {
         await page.close();
     }
 }
+
+async function gotoWithRetry(page, url, options, retries = 1) {
+  try {
+    return await page.goto(url, options);
+  } catch (err) {
+    if (err.message.includes('Navigation timeout') && retries > 0) {
+      await new Promise(resolve => setTimeout(resolve, 3000)); // wait 3s
+      return gotoWithRetry(page, url, options, retries - 1);
+    }
+    throw err;
+  }
+}
+
+
 
 // Vendor-specific scraping logic
 const scraperStrategies = {
