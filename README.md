@@ -27,15 +27,13 @@ npm install
 
 ## 🔐 Environment Setup
 
-Create a `.env` file:
+Copy `.env.example` to `.env` and fill in the values:
 
 ```
-API_KEY=add-your-own-key
-PORT=5000
-GOOGLE_EMAIL=your-email@gmail.com
-GOOGLE_PASSWORD=your-password
+cp .env.example .env
 ```
 
+Edit `.env` to provide your own API key and credentials.
 Only use `.env` for local testing—never commit real credentials.
 
 ## 🧪 Run the Project

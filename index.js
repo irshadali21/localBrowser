@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 dotenv.config();
+const errorHandler = require('./middleware/errorHandler');
 
 // Middleware
 app.use(express.json());
@@ -26,6 +27,9 @@ app.use('/error', require('./routes/errorRoutes'));
 app.get('/', (req, res) => {
   res.json({ status: 'LocalBrowser API is running' });
 });
+
+// Centralized error handler
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
