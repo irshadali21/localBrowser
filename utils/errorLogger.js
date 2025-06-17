@@ -1,7 +1,7 @@
 const db = require('./db');
 const axios = require('axios');
 
-async function logError({ type, message, stack, route, input }) {
+async function logErrorToDB({ type, message, stack, route, input }) {
   try {
     // 1. Save to SQLite
     db.prepare(`
@@ -23,4 +23,4 @@ async function logError({ type, message, stack, route, input }) {
   }
 }
 
-module.exports = { logError };
+module.exports = { logErrorToDB };
