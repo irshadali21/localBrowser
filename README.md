@@ -102,13 +102,10 @@ pm2 restart localBrowser
 
 **🧠 Available APIs**
 
-Endpoint	Description
 
-POST /prepare-chat	Open chat session, reuse if exists
-
-POST /chat	Send message, returns latest Gemini reply
-
-POST /close-chat	Gracefully close the active tab
-
-GET /open-login-page	Opens a tab for manual login
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| `POST` | `/chat/prepare` | Open chat session, reuse if exists |
+| `POST` | `/chat/message` | Send message and get latest Gemini reply |
+| `POST` | `/chat/close` | Gracefully close the active chat tab |
 
