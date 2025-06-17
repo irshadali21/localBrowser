@@ -24,7 +24,7 @@ async function configBrowser() {
     '--disable-infobars',
     '--window-position=0,0',
     '--ignore-certificate-errors',
-    '--ignore-certifcate-errors-spki-list',
+    '--ignore-certificate-errors-spki-list',
     '--disable-dev-shm-usage'
   ];
 
