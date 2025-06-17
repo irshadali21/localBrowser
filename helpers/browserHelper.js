@@ -19,9 +19,9 @@ async function googleSearch(query) {
     try {
         await page.goto('https://www.google.com', { waitUntil: 'networkidle2' });
         // Type the query
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await page.waitForTimeout(1000);
         await page.type('textarea[name="q"]', query, { delay: 100 });
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await page.waitForTimeout(1000);
         await page.keyboard.press('Enter');
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
@@ -42,7 +42,7 @@ async function googleSearch(query) {
             });
             return items;
         });
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await page.waitForTimeout(3000);
         return results;
     } finally {
         await page.close();
@@ -83,7 +83,7 @@ async function gotoWithRetry(page, url, options, retries = 1) {
     return await page.goto(url, options);
   } catch (err) {
     if (err.message.includes('Navigation timeout') && retries > 0) {
-      await new Promise(resolve => setTimeout(resolve, 3000)); // wait 3s
+      await page.waitForTimeout(3000); // wait 3s
       return gotoWithRetry(page, url, options, retries - 1);
     }
     throw err;
