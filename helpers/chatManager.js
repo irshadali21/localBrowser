@@ -43,12 +43,14 @@ async function sendChat(message) {
   await chatPage.setRequestInterception(true);
   let streamDone = false;
 
-  chatPage.on('requestfinished', req => {
+  const onRequestFinished = req => {
     if (req.url().includes('StreamGenerate')) {
       console.log('[Gemini] StreamGenerate completed');
       streamDone = true;
+      chatPage.off('requestfinished', onRequestFinished);
     }
-  });
+  };
+  chatPage.on('requestfinished', onRequestFinished);
 
   await chatPage.type('rich-textarea', message);
   await chatPage.keyboard.press('Enter');

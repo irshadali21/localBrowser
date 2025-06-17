@@ -59,7 +59,7 @@ node index.js
 
 API will run at: http://localhost:5000
 
-**For my personal use**  (I  forget too many times) VPS instructions
+**For my personal use**  (I forget too many times) VPS instructions
 
 🔐  Create .env File
 
@@ -108,4 +108,9 @@ pm2 restart localBrowser
 | `POST` | `/chat/prepare` | Open chat session, reuse if exists |
 | `POST` | `/chat/message` | Send message and get latest Gemini reply |
 | `POST` | `/chat/close` | Gracefully close the active chat tab |
+| `POST` | `/browser/execute` | Execute JavaScript in a new browser page |
+| `GET` | `/browser/search` | Search the web using Google |
+| `GET` | `/browser/visit` | Visit the specified URL and return HTML |
+| `GET` | `/browser/scrape` | Scrape a product page using a vendor |
+| `POST` | `/error/report` | Report an error to the server |
 
