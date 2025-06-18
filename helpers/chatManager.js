@@ -1,14 +1,14 @@
 // chatManager.js
 require('dotenv').config();
-const { getOrCreateChatPage } = require('../utils/pageFactory');
+const { requestPage, closePage } = require('../utils/pageManager');
 
-
+let chatPageId = null;
 let chatPage = null;
-let idleTimer = null;
-const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
 async function prepareChat() {
-  chatPage = await getOrCreateChatPage();
+  const { page, id } = await requestPage('chat');
+  chatPage = page;
+  chatPageId = id;
 
   await dismissGeminiPopup(chatPage);
 
@@ -23,12 +23,15 @@ async function prepareChat() {
     return { status: 'login_failed' };
   }
 
-  resetIdleTimer();
-  return { status: 'ready' };
+  return { status: 'ready', pageId: chatPageId };
 }
 
 async function sendChat(message) {
-  if (!chatPage || chatPage.isClosed()) await prepareChat();
+  if (!chatPage || chatPage.isClosed()) {
+    const { page, id } = await requestPage('chat');
+    chatPage = page;
+    chatPageId = id;
+  }
 
   await chatPage.setRequestInterception(true);
   let streamDone = false;
@@ -56,14 +59,15 @@ async function sendChat(message) {
     return responses.at(-1)?.innerText?.trim() || 'No response found.';
   });
 
-  resetIdleTimer();
   return response;
 }
 
 async function closeChat() {
-  if (chatPage && !chatPage.isClosed()) await chatPage.close();
-  chatPage = null;
-  clearTimeout(idleTimer);
+  if (chatPageId) {
+    closePage(chatPageId);
+    chatPageId = null;
+    chatPage = null;
+  }
 }
 
 async function dismissGeminiPopup(page) {
@@ -82,14 +86,6 @@ async function dismissGeminiPopup(page) {
   } catch {
     // Silent fail if popup not found
   }
-}
-
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => {
-    if (chatPage && !chatPage.isClosed()) chatPage.close();
-    chatPage = null;
-  }, IDLE_TIMEOUT_MS);
 }
 
 module.exports = {
