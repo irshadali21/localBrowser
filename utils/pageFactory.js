@@ -1,7 +1,6 @@
 // utils/pageFactory.js
 const configBrowser = require('../puppeteerConfig');
 let browser = null;
-let chatPage = null;
 
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125.0.0.0 Safari/537.36';
 
@@ -17,18 +16,9 @@ async function getConfiguredPage() {
 }
 
 
-async function getOrCreateChatPage() {
-  if (chatPage && !chatPage.isClosed()) return chatPage;
-
-  browser = await getBrowser();
-  chatPage = await browser.newPage();
-  await chatPage.setUserAgent(userAgent);
-  await chatPage.goto('https://gemini.google.com');
-  return chatPage;
-}
+// creating a new page is handled by the page manager
 
 module.exports = {
   getConfiguredPage,
-  getOrCreateChatPage,
   getBrowser
 };

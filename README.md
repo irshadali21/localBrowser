@@ -90,6 +90,8 @@ To use the chat endpoints you must sign in to Gemini manually. Run `POST /chat/p
 | `GET`  | `/browser/search` | Search the web using Google |
 | `GET`  | `/browser/visit`  | Visit the specified URL and return HTML |
 | `GET`  | `/browser/scrape` | Scrape a product page using a vendor |
+| `GET`  | `/pages/list` | List tracked browser pages |
+| `POST` | `/pages/request` | Get or create a page of a given type |
 | `POST` | `/error/report`   | Report an error to the server |
 
 A Postman collection for these endpoints is available in `postman/LocalBrowser.postman_collection.json`. Import it into Postman and set `baseUrl` and `API_KEY` variables to match your environment.

@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 app.use('/chat', require('./routes/chatRoutes'));
 app.use('/browser', require('./routes/browserRoutes'));
 app.use('/error', require('./routes/errorRoutes'));
+app.use('/pages', require('./routes/pageRoutes'));
 
 
 // Default route
