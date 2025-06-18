@@ -1,21 +1,35 @@
 // helpers/browserHelper.js
-const { getConfiguredPage } = require('../utils/pageFactory');
+const { requestPage, closePage } = require('../utils/pageManager');
+
+let browserPageId = null;
+let browserPage = null;
+
+async function getBrowserPage() {
+    const { page, id } = await requestPage('browser');
+    browserPage = page;
+    browserPageId = id;
+    return browserPage;
+}
+
+async function closeBrowser() {
+    if (browserPageId) {
+        closePage(browserPageId);
+        browserPageId = null;
+        browserPage = null;
+    }
+}
 
 // Remote code execution via browser context
 async function executeCode(userCode) {
-    const page = await getConfiguredPage();
-    try {
-        await page.setDefaultNavigationTimeout(60000);
-        const fn = new Function('page', userCode);
-        return await fn(page);
-    } finally {
-        await page.close();
-    }
+    const page = await getBrowserPage();
+    await page.setDefaultNavigationTimeout(60000);
+    const fn = new Function('page', userCode);
+    return await fn(page);
 }
 
 // Google Search (title, link, snippet)
 async function googleSearch(query) {
-    const page = await getConfiguredPage();
+    const page = await getBrowserPage();
     try {
         await page.goto('https://www.google.com', { waitUntil: 'networkidle2' });
         // Type the query
@@ -45,13 +59,13 @@ async function googleSearch(query) {
         await page.waitForTimeout(3000);
         return results;
     } finally {
-        await page.close();
+        // keep page open for reuse
     }
 }
 
 // Visit a URL and return stripped HTML content
 async function visitUrl(url) {
-    const page = await getConfiguredPage();
+    const page = await getBrowserPage();
     try {
         await page.goto(url, { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => {
@@ -59,13 +73,13 @@ async function visitUrl(url) {
         });
         return await page.content();
     } finally {
-        await page.close();
+        // keep page open for reuse
     }
 }
 
 // Vendor scraper dispatcher
 async function scrapeProduct(url, vendor) {
-    const page = await getConfiguredPage();
+    const page = await getBrowserPage();
     try {
         await gotoWithRetry(page, url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
@@ -74,7 +88,7 @@ async function scrapeProduct(url, vendor) {
 
         return await strategy(page);
     } finally {
-        await page.close();
+        // keep page open for reuse
     }
 }
 
@@ -126,5 +140,6 @@ module.exports = {
     executeCode,
     googleSearch,
     visitUrl,
-    scrapeProduct
+    scrapeProduct,
+    closeBrowser
 };
