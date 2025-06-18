@@ -19,7 +19,8 @@ async function prepareChat() {
   );
 
   if (isLoggedOut) {
-   return { status: 'login_failed' };
+    console.log('[Gemini] Not logged in. Please complete the login manually.');
+    return { status: 'login_failed' };
   }
 
   resetIdleTimer();

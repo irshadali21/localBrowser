@@ -46,6 +46,10 @@ node index.js
 
 The API will be available at `http://localhost:5000`.
 
+### Manual Gemini Login
+
+To use the chat endpoints you must sign in to Gemini manually. Run `POST /chat/prepare` once while the server is started (with `HEADLESS=false` in your `.env`). A browser window will open—log in and close the tab. The session is stored and reused for future requests.
+
 ## VPS Setup (personal reference)
 
 1. Create the `.env` file and add the required values.
