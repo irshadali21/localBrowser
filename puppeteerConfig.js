@@ -6,7 +6,7 @@ const AnonymizeUAPlugin = require('puppeteer-extra-plugin-anonymize-ua')();
 const UserPreferencesPlugin = require('puppeteer-extra-plugin-user-preferences')();
 
 const path = require('path');
-require('dotenv').config();
+process.env.DISPLAY = ':1';
 
 // Use Puppeteer Extra plugins
 puppeteer.use(StealthPlugin());
