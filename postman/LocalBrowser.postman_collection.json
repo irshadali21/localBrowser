@@ -10,11 +10,11 @@
       "request": {
         "method": "GET",
         "header": [
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["/"]
         }
       }
@@ -25,11 +25,11 @@
         "method": "POST",
         "header": [
           {"key": "Content-Type", "value": "application/json"},
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/chat/prepare",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/chat/prepare",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["chat", "prepare"]
         }
       }
@@ -40,15 +40,15 @@
         "method": "POST",
         "header": [
           {"key": "Content-Type", "value": "application/json"},
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"prompt\": \"Hello\"\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/chat/message",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/chat/message",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["chat", "message"]
         }
       }
@@ -59,11 +59,11 @@
         "method": "POST",
         "header": [
           {"key": "Content-Type", "value": "application/json"},
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/chat/close",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/chat/close",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["chat", "close"]
         }
       }
@@ -74,15 +74,15 @@
         "method": "POST",
         "header": [
           {"key": "Content-Type", "value": "application/json"},
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"code\": \"console.log('hello')\"\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/browser/execute",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/browser/execute",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["browser", "execute"]
         }
       }
@@ -92,11 +92,11 @@
       "request": {
         "method": "GET",
         "header": [
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/browser/search?q=hello",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/browser/search?q=hello",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["browser", "search"],
           "query": [{"key": "q", "value": "hello"}]
         }
@@ -107,11 +107,11 @@
       "request": {
         "method": "GET",
         "header": [
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/browser/visit?url=https://example.com",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/browser/visit?url=https://example.com",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["browser", "visit"],
           "query": [{"key": "url", "value": "https://example.com"}]
         }
@@ -122,11 +122,11 @@
       "request": {
         "method": "GET",
         "header": [
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "url": {
-          "raw": "{{baseUrl}}/browser/scrape?url=https://example.com&vendor=test",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/browser/scrape?url=https://example.com&vendor=test",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["browser", "scrape"],
           "query": [
             {"key": "url", "value": "https://example.com"},
@@ -141,15 +141,15 @@
         "method": "POST",
         "header": [
           {"key": "Content-Type", "value": "application/json"},
-          {"key": "x-api-key", "value": "{{API_KEY}}"}
+          {"key": "x-api-key", "value": "{{localBrowser_API_KEY}}"}
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"type\": \"ERROR_TYPE\",\n  \"message\": \"Something went wrong\",\n  \"stack\": \"\",\n  \"route\": \"/example\",\n  \"input\": {}\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/error/report",
-          "host": ["{{baseUrl}}"],
+          "raw": "{{localBrowserBaseUrl}}/error/report",
+          "host": ["{{localBrowserBaseUrl}}"],
           "path": ["error", "report"]
         }
       }

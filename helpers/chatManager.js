@@ -35,6 +35,7 @@ async function sendChat(message) {
 
   await chatPage.setRequestInterception(true);
   let streamDone = false;
+  await dismissGeminiPopup(chatPage);
 
   const onRequestFinished = req => {
     if (req.url().includes('StreamGenerate')) {
@@ -49,14 +50,16 @@ async function sendChat(message) {
   await chatPage.keyboard.press('Enter');
 
   await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject('Timeout waiting for Gemini response'), 15000);
+    const timeout = setTimeout(() => reject('Timeout waiting for Gemini response'), 150000);
     const poll = () => streamDone ? (clearTimeout(timeout), resolve()) : setTimeout(poll, 100);
     poll();
   });
 
   const response = await chatPage.evaluate(() => {
     const responses = Array.from(document.querySelectorAll('message-content'));
-    return responses.at(-1)?.innerText?.trim() || 'No response found.';
+     const lastResponse = responses[responses.length - 1];
+    return lastResponse?.innerText?.trim() || 'No response found.';
+
   });
 
   return response;
