@@ -1,0 +1,158 @@
+{
+  "info": {
+    "_postman_id": "cbb0ae7c-1964-4fcf-a646-c9d663a60df4",
+    "name": "LocalBrowser API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Root",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": ["/"]
+        }
+      }
+    },
+    {
+      "name": "Chat Prepare",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/chat/prepare",
+          "host": ["{{baseUrl}}"],
+          "path": ["chat", "prepare"]
+        }
+      }
+    },
+    {
+      "name": "Chat Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Hello\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/chat/message",
+          "host": ["{{baseUrl}}"],
+          "path": ["chat", "message"]
+        }
+      }
+    },
+    {
+      "name": "Chat Close",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/chat/close",
+          "host": ["{{baseUrl}}"],
+          "path": ["chat", "close"]
+        }
+      }
+    },
+    {
+      "name": "Browser Execute",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"console.log('hello')\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/browser/execute",
+          "host": ["{{baseUrl}}"],
+          "path": ["browser", "execute"]
+        }
+      }
+    },
+    {
+      "name": "Browser Search",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/browser/search?q=hello",
+          "host": ["{{baseUrl}}"],
+          "path": ["browser", "search"],
+          "query": [{"key": "q", "value": "hello"}]
+        }
+      }
+    },
+    {
+      "name": "Browser Visit",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/browser/visit?url=https://example.com",
+          "host": ["{{baseUrl}}"],
+          "path": ["browser", "visit"],
+          "query": [{"key": "url", "value": "https://example.com"}]
+        }
+      }
+    },
+    {
+      "name": "Browser Scrape",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/browser/scrape?url=https://example.com&vendor=test",
+          "host": ["{{baseUrl}}"],
+          "path": ["browser", "scrape"],
+          "query": [
+            {"key": "url", "value": "https://example.com"},
+            {"key": "vendor", "value": "test"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Error Report",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "x-api-key", "value": "{{API_KEY}}"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"ERROR_TYPE\",\n  \"message\": \"Something went wrong\",\n  \"stack\": \"\",\n  \"route\": \"/example\",\n  \"input\": {}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/error/report",
+          "host": ["{{baseUrl}}"],
+          "path": ["error", "report"]
+        }
+      }
+    }
+  ]
+}
