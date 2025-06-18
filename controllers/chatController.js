@@ -9,6 +9,13 @@ exports.prepare = async (req, res, next) => {
     res.json(result);
   } catch (err) {
     console.error('[ChatController] Prepare error:', err);
+    logErrorToDB({
+      type: 'CHAT_PREPARE_FAILED',
+      message: err.message,
+      stack: err.stack,
+      route: '/chat/prepare',
+      input: req.body
+    });
     next(err);
   }
 };

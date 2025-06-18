@@ -1,21 +1,15 @@
 // chatManager.js
 require('dotenv').config();
-const configBrowser = require('../puppeteerConfig');
+const { getOrCreateChatPage } = require('../utils/pageFactory');
 
-let browser = null;
+
 let chatPage = null;
 let idleTimer = null;
 const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
 async function prepareChat() {
-  if (chatPage && !chatPage.isClosed()) return { status: 'ready' };
+  chatPage = await getOrCreateChatPage();
 
-  browser = browser || await configBrowser();
-  chatPage = await browser.newPage();
-
-  chatPage.on('console', msg => console.log('[Browser]', msg.text()));
-
-  await chatPage.goto('https://gemini.google.com/app', { waitUntil: 'networkidle2' });
   await dismissGeminiPopup(chatPage);
 
   const isLoggedOut = await chatPage.evaluate(() =>
@@ -25,12 +19,7 @@ async function prepareChat() {
   );
 
   if (isLoggedOut) {
-    console.log('[Gemini] Logging in...');
-    await performLogin(chatPage);
-    const stillLoggedOut = await chatPage.evaluate(() =>
-      !!document.querySelector('a[href*="accounts.google.com"]')
-    );
-    if (stillLoggedOut) return { status: 'login_failed' };
+   return { status: 'login_failed' };
   }
 
   resetIdleTimer();
@@ -74,19 +63,6 @@ async function closeChat() {
   if (chatPage && !chatPage.isClosed()) await chatPage.close();
   chatPage = null;
   clearTimeout(idleTimer);
-}
-
-async function performLogin(page) {
-  await page.goto('https://accounts.google.com/');
-  await page.type('input[type="email"]', process.env.GOOGLE_EMAIL, { delay: 100 });
-  await page.keyboard.press('Enter');
-  await page.waitForNavigation({ waitUntil: 'networkidle2' });
-
-  await page.waitForSelector('input[type="password"]', { visible: true });
-  await page.type('input[type="password"]', process.env.GOOGLE_PASSWORD, { delay: 100 });
-  await page.keyboard.press('Enter');
-  await page.waitForNavigation({ waitUntil: 'networkidle2' });
-  await page.goto('https://gemini.google.com/app', { waitUntil: 'networkidle2' });
 }
 
 async function dismissGeminiPopup(page) {
