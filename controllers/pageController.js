@@ -1,4 +1,4 @@
-const { listPages, requestPage } = require('../utils/pageManager');
+const { listPages, requestPage, closeChat } = require('../utils/pageManager');
 
 exports.list = (req, res) => {
   const pages = listPages();
@@ -12,6 +12,16 @@ exports.request = async (req, res, next) => {
     const { id } = await requestPage(type);
     res.json({ pageId: id });
   } catch (err) {
+    next(err);
+  }
+};
+
+exports.close = async (req, res, next) => {
+  try {
+    await closeChat();
+    res.json({ status: 'chat_closed' });
+  } catch (err) {
+    console.error('[ChatController] Close error:', err);
     next(err);
   }
 };

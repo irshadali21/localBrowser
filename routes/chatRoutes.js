@@ -18,7 +18,4 @@ router.post('/prepare', chatController.prepare);
 // POST /chat/message
 router.post('/message', validatePrompt, chatController.message);
 
-// POST /chat/close
-router.post('/close', chatController.close);
-
 module.exports = router;

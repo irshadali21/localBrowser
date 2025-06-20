@@ -1,8 +1,7 @@
 const db = require('./db');
-const { getConfiguredPage } = require('./pageFactory');
+const { getConfiguredPage, getBrowser } = require('./pageFactory');
 
-const pages = new Map(); // id -> Puppeteer Page
-const IDLE_TIMEOUT_MS = 60 * 60 * 1000;
+const pages = new Map(); 
 
 function updateStatusIfClosed(id) {
   const page = pages.get(id);
@@ -14,22 +13,40 @@ function updateStatusIfClosed(id) {
   return false;
 }
 
-function startCleanupLoop() {
-  setInterval(() => {
-    const threshold = new Date(Date.now() - IDLE_TIMEOUT_MS).toISOString();
-    const stale = db
-      .prepare('SELECT id FROM active_pages WHERE status = \'active\' AND last_used < ?')
-      .all(threshold);
-    for (const { id } of stale) {
-      const page = pages.get(id);
-      if (page && !page.isClosed()) page.close();
-      db.prepare('UPDATE active_pages SET status = \'closed\' WHERE id = ?').run(id);
-      pages.delete(id);
+
+async function requestPage(type) {
+  // Ensure browser instance is still valid
+  const browser = await getBrowser();
+  if (!browser || browser.process()?.exitCode !== null) {
+    console.warn('[PageManager] Browser not running. Resetting state.');
+    pages.clear();
+    return createPage(type);
+  }
+
+  // Try to reuse existing page
+  const row = db.prepare(`
+    SELECT id FROM active_pages WHERE type = ? AND status = \'active\' ORDER BY last_used DESC LIMIT 1
+  `).get(type);
+
+  if (row) {
+    const page = pages.get(row.id);
+    const stillValid = page && !page.isClosed();
+
+    if (stillValid) {
+      db.prepare('UPDATE active_pages SET last_used = CURRENT_TIMESTAMP WHERE id = ?').run(row.id);
+      return { id: row.id, page };
     }
-  }, 60 * 1000);
+
+    // Clean up invalid page
+    db.prepare('UPDATE active_pages SET status = \'closed\' WHERE id = ?').run(row.id);
+    pages.delete(row.id);
+  }
+
+  // Create a fresh one
+  return createPage(type);
 }
 
-startCleanupLoop();
+
 
 async function createPage(type) {
   const page = await getConfiguredPage();
@@ -46,23 +63,23 @@ async function createPage(type) {
   return { id, page };
 }
 
-async function requestPage(type) {
-  const row = db
-    .prepare('SELECT id FROM active_pages WHERE type = ? AND status = \'active\' ORDER BY last_used DESC LIMIT 1')
-    .get(type);
-  if (row) {
-    if (!updateStatusIfClosed(row.id)) {
-      db.prepare('UPDATE active_pages SET last_used = CURRENT_TIMESTAMP WHERE id = ?').run(row.id);
-      return { id: row.id, page: pages.get(row.id) };
-    }
-  }
-  return createPage(type);
-}
+
 
 function listPages() {
+  db.prepare('DELETE FROM active_pages WHERE status = \'closed\'').run();
   return db.prepare('SELECT * FROM active_pages ORDER BY id').all();
 }
 
+
+
+
+async function closeChat() {
+  if (chatPageId) {
+    closePage(chatPageId);
+    chatPageId = null;
+    chatPage = null;
+  }
+}
 function closePage(id) {
   const page = pages.get(id);
   if (page && !page.isClosed()) page.close();
@@ -74,5 +91,6 @@ module.exports = {
   requestPage,
   listPages,
   closePage,
-  updateStatusIfClosed
+  updateStatusIfClosed,
+  closeChat
 };

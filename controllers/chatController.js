@@ -1,5 +1,5 @@
 // controllers/chatController.js
-const { prepareChat, sendChat, closeChat } = require('../helpers/chatManager');
+const { prepareChat, sendChat } = require('../helpers/chatManager');
 const { logErrorToDB } = require('../utils/errorLogger');
 
 // Prepare Gemini chat session
@@ -38,13 +38,3 @@ exports.message = async (req, res, next) => {
   }
 };
 
-// Close Gemini chat tab
-exports.close = async (req, res, next) => {
-  try {
-    await closeChat();
-    res.json({ status: 'chat_closed' });
-  } catch (err) {
-    console.error('[ChatController] Close error:', err);
-    next(err);
-  }
-};
