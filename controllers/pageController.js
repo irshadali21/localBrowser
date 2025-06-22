@@ -19,7 +19,7 @@ exports.request = async (req, res, next) => {
 exports.close = async (req, res, next) => {
   try {
     await closeChat();
-    res.json({ status: 'chat_closed' });
+    res.json({ status: 'pages closed' });
   } catch (err) {
     console.error('[ChatController] Close error:', err);
     next(err);

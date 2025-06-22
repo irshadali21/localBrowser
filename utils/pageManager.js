@@ -74,10 +74,17 @@ function listPages() {
 
 
 async function closeChat() {
-  if (chatPageId) {
-    closePage(chatPageId);
-    chatPageId = null;
-    chatPage = null;
+  const pagesToClose = db.prepare('SELECT id FROM active_pages WHERE status = \'active\'').all();
+
+  for (const { id } of pagesToClose) {
+    if (pages.has(id)) {
+      const page = pages.get(id);
+      if (!page.isClosed()) {
+        await page.close();
+      }
+      pages.delete(id);
+    }
+    db.prepare('UPDATE active_pages SET status = \'closed\' WHERE id = ?').run(id);
   }
 }
 function closePage(id) {
